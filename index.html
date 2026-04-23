@@ -5,6 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <title>Lluc Domenech · AI Creative Lead</title>
+
+  <!-- Access gate: shows content only if URL has ?k=<token> -->
+  <style id="pv-gate-style">html{visibility:hidden}</style>
+  <script>
+    (function () {
+      var TOKEN = "lluc-pyb-2026";
+      var host = location.hostname;
+      var isLocal = host === "localhost" || host === "127.0.0.1" || host === "" || host === "0.0.0.0";
+      var q = new URLSearchParams(location.search);
+      var urlTok = q.get("k");
+      var ok = isLocal || urlTok === TOKEN;
+      try {
+        if (urlTok === TOKEN) localStorage.setItem("pvp", "1");
+        if (!ok && localStorage.getItem("pvp") === "1") ok = true;
+      } catch (_) {}
+      if (ok) {
+        var s = document.getElementById("pv-gate-style");
+        if (s) s.remove();
+      } else {
+        window.__PV_BLOCKED = true;
+        document.addEventListener("DOMContentLoaded", function () {
+          document.title = "—";
+          document.documentElement.style.visibility = "visible";
+          document.body.innerHTML =
+            '<div style="position:fixed;inset:0;background:#0a0a0a;color:#4a4a46;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.3em;display:flex;align-items:center;justify-content:center;">—</div>';
+        });
+      }
+    })();
+  </script>
   <meta name="description" content="Portfolio de Lluc Domenech — AI Creative Lead. Dirección creativa en la intersección de IA generativa y producción audiovisual." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -165,7 +194,7 @@
       <div class="case__track">
         <button class="campaign" type="button"
                 data-type="video"
-                data-video="projects/01/video.mp4?v=2"
+                data-video="projects/01/video.mp4?v=3"
                 data-poster="projects/01/cover.png">
           <div class="campaign__media" style="--bg: url('projects/01/cover.png')"></div>
           <div class="campaign__shade"></div>

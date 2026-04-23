@@ -5,6 +5,7 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 // ---------- Visit ping · 1 push a Telegram por sesión ----------
 (() => {
   try {
+    if (window.__PV_BLOCKED) return;
     const host = location.hostname;
     if (host === "localhost" || host === "127.0.0.1" || host === "0.0.0.0" || host === "") return;
     if (sessionStorage.getItem("vp_sent")) return;
