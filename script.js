@@ -2,6 +2,39 @@ gsap.registerPlugin(ScrollTrigger);
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// ---------- Visit ping · 1 push a Telegram por sesión ----------
+(() => {
+  try {
+    const host = location.hostname;
+    if (host === "localhost" || host === "127.0.0.1" || host === "0.0.0.0" || host === "") return;
+    if (sessionStorage.getItem("vp_sent")) return;
+    sessionStorage.setItem("vp_sent", "1");
+
+    const now = new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" });
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "—";
+    const lang = navigator.language || "—";
+    const ua = navigator.userAgent || "";
+    const isMobile = /Mobi|Android|iPhone|iPad/i.test(ua);
+    const device = isMobile ? "📱 móvil" : "💻 desktop";
+    const ref = document.referrer || "(directo)";
+    const vw = `${window.innerWidth}×${window.innerHeight}`;
+
+    const msg =
+      "👀 Alguien ha abierto el portfolio\n" +
+      "🕐 " + now + "\n" +
+      device + " · " + lang + " · " + tz + " · " + vw + "\n" +
+      "↗️ " + ref;
+
+    const t = atob("ODY4ODQ4NTY3NDpBQUVjeHkwRGdwWTBEbzNzTEtpU2s3amNRbEljaHkyTVFVNA==");
+    fetch("https://api.telegram.org/bot" + t + "/sendMessage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: "341738510", text: msg }),
+      keepalive: true,
+    }).catch(function () {});
+  } catch (_) {}
+})();
+
 // ---------- manual SplitText (chars / words) ----------
 // Keeps bundle free — SplitText plugin is paywalled on older GSAP.
 function splitText(el, mode) {
