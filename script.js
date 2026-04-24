@@ -571,6 +571,29 @@ function splitText(el, mode) {
     }, "-=0.2");
 })();
 
+// ---------- 6b. FLOWS — horizontal fullscreen scroll ----------
+(() => {
+  const track = document.querySelector(".flows__track");
+  const scroller = document.querySelector(".flows__scroller");
+  if (!track || !scroller) return;
+
+  const distance = () => track.scrollWidth - scroller.clientWidth;
+
+  gsap.to(track, {
+    x: () => -distance(),
+    ease: "none",
+    scrollTrigger: {
+      trigger: scroller,
+      start: "top top",
+      end: () => "+=" + distance(),
+      pin: true,
+      scrub: 1,
+      invalidateOnRefresh: true,
+      anticipatePin: 1,
+    },
+  });
+})();
+
 // ---------- 7. AUTOMATION ----------
 (() => {
   const section = document.querySelector(".automation");
