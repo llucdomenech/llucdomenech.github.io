@@ -982,6 +982,33 @@ body.modal-open { overflow: hidden; }
 .auto-card--wide {
   grid-column: 1 / -1;
 }
+.auto-card--video {
+  padding: 0;
+  overflow: hidden;
+}
+.auto-card--video .auto-card__head {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  right: 24px;
+  z-index: 2;
+}
+.auto-card--video .auto-card__head h3 {
+  background: rgba(10, 10, 10, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+.auto-card--video { position: relative; min-height: 280px; }
+.auto-card__video {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  display: block;
+}
 
 .automation__outro {
   max-width: 1080px;
