@@ -2,7 +2,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// ---------- Visit ping · 1 push a Telegram por sesión ----------
+// ---------- Visit tracker · Telegram con geo + engagement ----------
 (() => {
   try {
     if (window.__PV_BLOCKED) return;
@@ -11,28 +11,147 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
     if (sessionStorage.getItem("vp_sent")) return;
     sessionStorage.setItem("vp_sent", "1");
 
-    const now = new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" });
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "—";
-    const lang = navigator.language || "—";
-    const ua = navigator.userAgent || "";
-    const isMobile = /Mobi|Android|iPhone|iPad/i.test(ua);
-    const device = isMobile ? "📱 móvil" : "💻 desktop";
-    const ref = document.referrer || "(directo)";
-    const vw = `${window.innerWidth}×${window.innerHeight}`;
+    const TOKEN = atob("ODY4ODQ4NTY3NDpBQUVjeHkwRGdwWTBEbzNzTEtpU2s3amNRbEljaHkyTVFVNA==");
+    const CHAT = "341738510";
+    const API = "https://api.telegram.org/bot" + TOKEN + "/sendMessage";
 
-    const msg =
-      "👀 Alguien ha abierto el portfolio\n" +
-      "🕐 " + now + "\n" +
-      device + " · " + lang + " · " + tz + " · " + vw + "\n" +
-      "↗️ " + ref;
+    function send(text) {
+      return fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: CHAT, text: text }),
+        keepalive: true,
+      }).catch(function () {});
+    }
+    function beacon(text) {
+      try {
+        const blob = new Blob(
+          [JSON.stringify({ chat_id: CHAT, text: text })],
+          { type: "application/json" }
+        );
+        navigator.sendBeacon(API, blob);
+      } catch (_) {}
+    }
 
-    const t = atob("ODY4ODQ4NTY3NDpBQUVjeHkwRGdwWTBEbzNzTEtpU2s3amNRbEljaHkyTVFVNA==");
-    fetch("https://api.telegram.org/bot" + t + "/sendMessage", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: "341738510", text: msg }),
-      keepalive: true,
-    }).catch(function () {});
+    function parseUA() {
+      const ua = navigator.userAgent || "";
+      let browser = "?";
+      if (/Edg\//.test(ua)) browser = "Edge";
+      else if (/Chrome\//.test(ua) && !/Edg\//.test(ua)) browser = "Chrome";
+      else if (/Firefox\//.test(ua)) browser = "Firefox";
+      else if (/Safari\//.test(ua)) browser = "Safari";
+      let os = "?";
+      if (/iPhone|iPad|iPod/.test(ua)) os = "iOS";
+      else if (/Android/.test(ua)) os = "Android";
+      else if (/Mac/.test(ua)) os = "macOS";
+      else if (/Windows/.test(ua)) os = "Windows";
+      else if (/Linux/.test(ua)) os = "Linux";
+      const isMobile = /Mobi|Android|iPhone|iPad/i.test(ua);
+      return { browser: browser, os: os, isMobile: isMobile };
+    }
+
+    // Session state para el resumen
+    const state = {
+      start: Date.now(),
+      maxScroll: 0,
+      modals: new Set(),
+      clickedMail: false,
+      clickedPhone: false,
+      tabHides: 0,
+      summarySent: false,
+    };
+
+    // Scroll depth
+    let ticking = false;
+    window.addEventListener("scroll", function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        const h = document.documentElement;
+        const total = h.scrollHeight - h.clientHeight;
+        if (total > 0) {
+          const pct = Math.min(100, Math.round((h.scrollTop / total) * 100));
+          if (pct > state.maxScroll) state.maxScroll = pct;
+        }
+        ticking = false;
+      });
+    }, { passive: true });
+
+    // Click tracking (proyectos, email, teléfono)
+    document.addEventListener("click", function (e) {
+      const camp = e.target.closest(".campaign[data-type]");
+      if (camp) {
+        const t = camp.querySelector(".campaign__title");
+        if (t && t.textContent) state.modals.add(t.textContent.trim());
+      }
+      if (e.target.closest(".cta__mail")) state.clickedMail = true;
+      if (e.target.closest(".cta__phone")) state.clickedPhone = true;
+    });
+
+    // Tab hide counter
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") state.tabHides++;
+    });
+
+    function sendSummary() {
+      if (state.summarySent) return;
+      // Solo mandar resumen si estuvieron al menos 8s — evita bots y rebotes
+      if (Date.now() - state.start < 8000) return;
+      state.summarySent = true;
+
+      const elapsed = Math.round((Date.now() - state.start) / 1000);
+      const min = Math.floor(elapsed / 60);
+      const sec = elapsed % 60;
+      const timeStr = min > 0 ? min + "m " + sec + "s" : sec + "s";
+
+      const lines = ["👋 Han cerrado el portfolio"];
+      lines.push("⏱ Tiempo: " + timeStr);
+      lines.push("📜 Scroll máx: " + state.maxScroll + "%");
+      if (state.modals.size > 0) {
+        lines.push("🎬 Abrió: " + Array.from(state.modals).join(", "));
+      } else {
+        lines.push("🎬 No abrió ningún proyecto");
+      }
+      if (state.clickedMail) lines.push("📧 Clic en email");
+      if (state.clickedPhone) lines.push("📞 Clic en teléfono");
+      if (state.tabHides > 0) lines.push("👁 Cambió pestaña " + state.tabHides + "×");
+
+      beacon(lines.join("\n"));
+    }
+
+    // Summary on exit — pagehide es lo más fiable en todos los navegadores
+    window.addEventListener("pagehide", sendSummary);
+
+    // Ping inicial con geo
+    (async function () {
+      const p = parseUA();
+      const device = p.isMobile ? "📱 móvil" : "💻 desktop";
+      const now = new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" });
+      const lang = navigator.language || "—";
+      const vw = window.innerWidth + "×" + window.innerHeight;
+      const ref = document.referrer || "(directo)";
+
+      let geoLine = "";
+      try {
+        const res = await fetch("https://ipwho.is/");
+        const geo = await res.json();
+        if (geo && geo.success) {
+          const place = [geo.city, geo.region, geo.country].filter(Boolean).join(", ");
+          const isp = geo.connection && geo.connection.isp ? geo.connection.isp : "";
+          geoLine = "📍 " + place + (isp ? " · " + isp : "") + "\n";
+          if (geo.ip) geoLine += "🌐 IP " + geo.ip + "\n";
+        }
+      } catch (_) {}
+
+      const text =
+        "👀 Visita al portfolio\n" +
+        "🕐 " + now + "\n" +
+        geoLine +
+        device + " · " + p.os + " " + p.browser + " · " + lang + " · " + vw + "\n" +
+        "↗️ " + ref;
+
+      send(text);
+    })();
   } catch (_) {}
 })();
 
