@@ -1139,7 +1139,7 @@ body.modal-open { overflow: hidden; }
 .motion {
   position: relative;
   width: 100%;
-  height: 220px;
+  height: 140px;
   overflow: hidden;
   background: var(--bg);
   border-bottom: 1px solid var(--line);
@@ -1161,7 +1161,7 @@ body.modal-open { overflow: hidden; }
 }
 
 @media (max-width: 720px) {
-  .motion { height: 160px; }
+  .motion { height: 100px; }
 }
 
 /* PATH */
