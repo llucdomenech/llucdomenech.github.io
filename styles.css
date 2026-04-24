@@ -1135,6 +1135,36 @@ body.modal-open { overflow: hidden; }
   .node[data-idx="4"], .node[data-idx="5"], .node[data-idx="6"] { grid-column: 1; grid-row: auto; }
 }
 
+/* MOTION INTERLUDE */
+.motion {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  min-height: 420px;
+  overflow: hidden;
+  background: #000;
+  border-bottom: 1px solid var(--line);
+}
+.motion__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.motion__grade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(10, 10, 10, 0.6) 0%, rgba(10, 10, 10, 0) 18%, rgba(10, 10, 10, 0) 82%, rgba(10, 10, 10, 0.9) 100%);
+}
+
+@media (max-width: 720px) {
+  .motion { height: 50vh; min-height: 320px; }
+}
+
 /* PATH */
 .path {
   padding: 180px 40px;
