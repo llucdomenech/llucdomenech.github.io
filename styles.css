@@ -1151,6 +1151,7 @@ body.modal-open { overflow: hidden; }
   height: 100%;
   object-fit: cover;
   display: block;
+  mix-blend-mode: screen;
 }
 .motion__grade {
   position: absolute;
