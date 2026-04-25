@@ -649,10 +649,18 @@ img, svg { display: block; max-width: 100%; }
   will-change: transform;
 }
 .campaign--macarrisme { background: #1c2a32; }
-.campaign--macarrisme .campaign__media {
-  background-color: #1c2a32;
-  inset: -2px;
+.campaign--macarrisme .campaign__media { background-color: #1c2a32; }
+.campaign__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  filter: saturate(0.8) contrast(1.05);
 }
+.campaign:hover .campaign__img { transform: scale(1.04); transition: transform 1.4s cubic-bezier(0.2, 0.7, 0.2, 1); }
 .campaign__shade {
   position: absolute;
   inset: 0;
