@@ -649,7 +649,10 @@ img, svg { display: block; max-width: 100%; }
   will-change: transform;
 }
 .campaign--macarrisme { background: #1c2a32; }
-.campaign--macarrisme .campaign__media { background-color: #1c2a32; }
+.campaign--macarrisme .campaign__media {
+  background-color: #1c2a32;
+  inset: -2px;
+}
 .campaign__shade {
   position: absolute;
   inset: 0;
