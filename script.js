@@ -475,6 +475,7 @@ function splitText(el, mode) {
       gallery.className = "modal__gallery";
       try {
         const imgs = JSON.parse(card.dataset.gallery);
+        if (imgs.length === 1) gallery.classList.add("modal__gallery--single");
         imgs.forEach((src) => {
           const img = document.createElement("img");
           img.src = src;
